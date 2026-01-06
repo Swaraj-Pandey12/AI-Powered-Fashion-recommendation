@@ -1,0 +1,10 @@
+flask
+pandas
+numpy
+scikit-learn
+faiss-cpu
+sentence-transformers
+requests
+beautifulsoup4
+gunicorn
+

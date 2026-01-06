@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Fashion Recommender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+    <h1>👗 AI Fashion Recommender</h1>
+    <p class="subtitle">Search outfits based on your style!</p>
+
+    <form method="POST" class="search-box">
+        <input type="text" name="prompt" placeholder="Ex: Red casual dress for women" value="{{ prompt }}">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if message %}
+        <p class="error">{{ message }}</p>
+    {% endif %}
+
+    <div class="grid">
+        {% for item in results %}
+        <div class="card">
+            <a href="{{ item.url }}" target="_blank" class="btn">
+            <img src="{{ item.image_url }}" alt="Product Image">
+
+            <div class="info">
+                <h3>{{ item.name }}</h3>
+                <p class="brand">{{ item.designer }}</p>
+                                
+            </div>
+            </a>
+        </div>
+
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
