@@ -1,26 +1,48 @@
 import pandas as pd
-from sentence_transformers import SentenceTransformer
 import faiss
 import numpy as np
-import pickle
+from sentence_transformers import SentenceTransformer
 
-df = pd.read_csv("products.csv")
+# Load dataset
+df = pd.read_csv("data/metadata.csv")
 
-df["combined"] = (
+# Fill NaN values
+df.fillna("", inplace=True)
+
+# Combine important descriptive fields for better embeddings
+df["combined_text"] = (
     df["name"].astype(str) + " " +
+    df["short_description"].astype(str) + " " +
     df["description"].astype(str) + " " +
     df["tags"].astype(str) + " " +
-    df["Catogories"].astype(str)+ " " +
+    df["categories"].astype(str) + " " +
+    df["occasions"].astype(str) + " " +
+    df["designer"].astype(str) + " " +
+    df["material"].astype(str) + " " +
     df["color"].astype(str)
 )
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode(df["combined"].tolist(), convert_to_numpy=True)
+print("Number of products:", len(df))
 
-index = faiss.IndexFlatL2(embeddings.shape[1])
+# Load embedding model
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Generate embeddings
+texts = df["combined_text"].tolist()
+embeddings = model.encode(texts, show_progress_bar=True)
+
+# Convert to float32
+embeddings = np.array(embeddings).astype("float32")
+
+# Create FAISS index
+dimension = embeddings.shape[1]
+index = faiss.IndexFlatL2(dimension)
 index.add(embeddings)
 
-faiss.write_index(index, "product_index.faiss")
-pickle.dump(df, open("products.pkl", "wb"))
-print("🚀 FAISS index ready!")
-    
+# Save FAISS index
+faiss.write_index(index, "data/product_index.faiss")
+
+# Also save filtered metadata to keep alignment
+df.to_csv("data/filtered_metadata.csv", index=False)
+
+print("FAISS index built successfully")
