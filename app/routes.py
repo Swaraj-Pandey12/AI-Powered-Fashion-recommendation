@@ -1,33 +1,18 @@
 from flask import Blueprint, request, render_template
 
-def create_routes(recommender):
+def create_routes(recommender, gender_service):
     routes = Blueprint("routes", __name__)
 
     @routes.route("/", methods=["GET"])
     def home():
-        return render_template(
-            "index.html",
-            results=[],
-            message=None,
-            prompt=""
-        )
+        return render_template("index.html", results=[], message=None, prompt="")
 
     @routes.route("/search", methods=["POST"])
     def search():
-        # Get raw input
-        prompt_raw = request.form.get("prompt")
+        raw_prompt = request.form.get("prompt")
+        prompt_text = str(raw_prompt).strip() if raw_prompt else ""
 
-        # Convert safely to string (so .lower() won’t break)
-        if prompt_raw is None:
-            prompt_text = ""
-        else:
-            prompt_text = str(prompt_raw)
-
-        # Remove whitespace
-        prompt_text = prompt_text.strip()
-
-        # If input is empty
-        if prompt_text == "":
+        if not prompt_text:
             return render_template(
                 "index.html",
                 results=[],
@@ -35,34 +20,19 @@ def create_routes(recommender):
                 prompt=""
             )
 
-        # SAFELY lowercase the string (prompt_text is always a string)
-        lower_prompt = prompt_text.lower()
+        # Predict gender using ML model
+        predicted_gender = gender_service.predict(prompt_text)
 
-        # Gender detection
-        gender = None
-        if "men" in lower_prompt:
-            gender = "Men"
-        elif "women" in lower_prompt:
-            gender = "Women"
+        results = recommender.recommend(prompt_text, predicted_gender)
 
-        # Call recommender
-        try:
-            results = recommender.recommend(prompt_text, gender)
-        except Exception as e:
-            # In case recommender throws error
-            print("Recommender error:", e)
-            results = []
-
-        # If no results found
         if not results:
             return render_template(
                 "index.html",
                 results=[],
-                message="No results found for your query.",
+                message="No results found!",
                 prompt=prompt_text
             )
 
-        # Success: show results
         return render_template(
             "index.html",
             results=results,
