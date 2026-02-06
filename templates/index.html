@@ -135,8 +135,8 @@
         <div class="results">
             {% for item in results %}
                 <div class="card">
-                    {% if item.product_url %}
-                        <img src="{{ item.product_url }}" alt="{{ item.name }}">
+                    {% if item.image_url %}
+                        <img src="{{ item.image_url }}" alt="{{ item.name }}">
                     {% endif %}
                     <h3>{{ item.name }}</h3>
                     <p class="info">Gender: {{ item.gender }}</p>
