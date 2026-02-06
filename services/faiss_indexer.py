@@ -18,7 +18,7 @@ class FaissIndexer:
         # Load filtered metadata
         self.metadata = pd.read_csv(metadata_path)
 
-    def search(self, vector, top_k: int = 10):
+    def search(self, vector, top_k: int = 20):
         distances, indices = self.index.search(vector, top_k)
         results = []
 

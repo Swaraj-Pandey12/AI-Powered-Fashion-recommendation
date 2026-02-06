@@ -24,14 +24,14 @@ def create_routes(recommender, gender_service):
         # Predict gender using ML model
         if "women" in prompt_lower or "woman" in prompt_lower:
             predicted_gender = "Women"
-            print("GENDER OVERRIDE TRIGGERED → Women")
+            # print("GENDER OVERRIDE TRIGGERED → Women")
 
         elif "men" in prompt_lower or "man" in prompt_lower:
             predicted_gender = "Men"
-            print("GENDER OVERRIDE TRIGGERED → Men")
+            # print("GENDER OVERRIDE TRIGGERED → Men")
         else:
             predicted_gender = gender_service.predict(prompt_text)
-            print("predcited_gender: ",predicted_gender)
+            # print("predcited_gender: ",predicted_gender)
 
 
         results = recommender.recommend(prompt_text, predicted_gender)
